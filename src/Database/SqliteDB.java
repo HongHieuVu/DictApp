@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SqliteDB {
+    private static final String WORD = "word";
+    private static final String MEANING = "description";
+    private static final String WEB_STYLE = "html";
     private static Connection database = null;
 
     public SqliteDB(){
@@ -29,7 +32,6 @@ public class SqliteDB {
      * @return a word object with definition
      */
     public ResultSet getWordAV(String word){
-        //searches the database for this word
         String query = " SELECT word, description, pronounce FROM av WHERE word LIKE ?;";
         try {
             PreparedStatement preparedStatement = database.prepareStatement(query);
@@ -54,7 +56,7 @@ public class SqliteDB {
             ResultSet rs = preparedStatement.executeQuery();
             List<Word> resultList = new ArrayList<>();
             while (rs.next()) {
-                Word wordCreated = new Word(rs.getString("word"));
+                Word wordCreated = new Word(rs.getString(WORD));
                 resultList.add(wordCreated);
             }
             return resultList;
@@ -71,7 +73,7 @@ public class SqliteDB {
      * @return a word object with definition of the word entered
      */
     public List<Word> searchWordEV(String word) throws NoResult {
-        String query = " SELECT word, description, COUNT(*) OVER() AS resNum " +
+        String query = " SELECT word, description, html, COUNT(*) OVER() AS resNum " +
                 "FROM av WHERE word LIKE ?;";
         try {
             //execute query
@@ -86,9 +88,9 @@ public class SqliteDB {
             //append result
             List<Word> resultList = new ArrayList<>();
             for (int i = 0; i < numResult; i++){
-                resultList.add( new Word(rs.getString("word"), rs.getString("description")));
+                Word thisWord = new Word(rs.getString(WORD), rs.getString(MEANING), rs.getString(WEB_STYLE));
+                if (!thisWord.duplicated(resultList)) resultList.add(thisWord);
             }
-
 
             return resultList;
         } catch (SQLException e) {
