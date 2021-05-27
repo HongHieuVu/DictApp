@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import Database.DBExceptions.NoResult;
-import Database.DBExceptions.TooManyResults;
 import Database.SqliteDB;
 import Database.Word;
 
@@ -21,21 +20,21 @@ import javafx.scene.text.Text;
 
 public class AppController {
 
-    @FXML // ResourceBundle that was given to the FXMLLoader
+    @FXML
     private ResourceBundle resources;
 
     @FXML
     private URL location;
 
     @FXML
-    private TableView<Word> table;
+    private TableView<Word> table = new TableView<>();
     private ObservableList<Word> data;
 
     @FXML // fx:id="definition"
-    private Text definition; // Value injected by FXMLLoader
+    private Text definition;
 
     @FXML // fx:id="searchBar"
-    private TextField searchBar; // Value injected by FXMLLoader
+    private TextField searchBar;
 
     /**
      * search selected word
@@ -67,12 +66,14 @@ public class AppController {
     void showWord(MouseEvent event) {
         String selectedWord = table.getSelectionModel().getSelectedItem().getWord();
         SqliteDB database = new SqliteDB();
-        Word word;
+        List<Word> word;
         try {
             word = database.searchWordEV(selectedWord);
-            definition.setText(word.getExplain());
-        } catch (TooManyResults tooManyResults) {
-            tooManyResults.printStackTrace();
+            StringBuilder displayText = new StringBuilder();
+            for (Word result : word){
+                displayText.append(result.getExplain()).append("\n");
+            }
+            definition.setText(displayText.toString());
         } catch (NoResult noResult){
             definition.setText("No result for selected word");
         }
@@ -81,7 +82,6 @@ public class AppController {
 
     @FXML
     void initialize() {
-        table = new TableView<>();
         assert searchBar != null : "fx:id=\"searchBar\" was not injected: check your FXML file 'NewApp.fxml'.";
         assert definition != null : "fx:id=\"definition\" was not injected: check your FXML file 'NewApp.fxml'.";
     }
