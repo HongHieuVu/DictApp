@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.web.*?>
 
-<AnchorPane prefHeight="479.0" prefWidth="633.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AppController">
+<AnchorPane prefHeight="479.0" prefWidth="633.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AppController">
     <children>
         <TextField fx:id="searchBar" layoutX="201.0" layoutY="14.0" onKeyReleased="#searchInput" AnchorPane.leftAnchor="201.0" AnchorPane.topAnchor="14.0" />
         <TableView fx:id="table" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#showWord" prefHeight="479.0" prefWidth="187.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -15,10 +15,6 @@
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
             </columnResizePolicy>
         </TableView>
-        <Text fx:id="definition" layoutX="201.0" layoutY="101.0" opacity="0.66" strokeType="OUTSIDE" strokeWidth="0.0" text="ấn vào từ trong danh sách để xem giải nghĩa">
-            <font>
-                <Font name="Arial Bold" size="18.0" />
-            </font>
-        </Text>
+      <WebView id="def" fx:id="WebView" layoutX="207.0" layoutY="128.0" prefHeight="200.0" prefWidth="382.0" stylesheets="@Style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="190.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0" />
     </children>
 </AnchorPane>

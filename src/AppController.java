@@ -16,10 +16,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.text.Text;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 
 public class AppController {
 
+    public javafx.scene.web.WebView WebView = new WebView();
     @FXML
     private ResourceBundle resources;
 
@@ -29,9 +31,6 @@ public class AppController {
     @FXML
     private TableView<Word> table = new TableView<>();
     private ObservableList<Word> data;
-
-    @FXML // fx:id="definition"
-    private Text definition;
 
     @FXML // fx:id="searchBar"
     private TextField searchBar;
@@ -52,7 +51,7 @@ public class AppController {
                     new PropertyValueFactory<>(searchResultList.get(0).wordTargetProperty().getName())
             );
             table.getColumns().setAll(resultCol);
-            definition.setText("ấn vào từ trong danh sách để xem giải nghĩa");
+            viewer.loadContent("ấn vào từng từ để xem giải nghĩa");
         } catch (IllegalArgumentException | IllegalStateException e){
             System.out.println(e.getMessage());
         }
@@ -66,23 +65,25 @@ public class AppController {
     void showWord(MouseEvent event) {
         String selectedWord = table.getSelectionModel().getSelectedItem().getWord();
         SqliteDB database = new SqliteDB();
+
         List<Word> word;
         try {
             word = database.searchWordEV(selectedWord);
             StringBuilder displayText = new StringBuilder();
             for (Word result : word){
-                displayText.append(result.getExplain()).append("\n");
+                displayText.append(result.getHtml()).append("\n");
             }
-            definition.setText(displayText.toString());
+            viewer.loadContent(displayText.toString());
         } catch (NoResult noResult){
-            definition.setText("No result for selected word");
+            viewer.loadContent("No result for selected word");
         }
     }
 
-
+    WebEngine viewer;
     @FXML
     void initialize() {
+        viewer = WebView.getEngine();
+        viewer.loadContent("ấn vào từng từ để xem giải nghĩa");
         assert searchBar != null : "fx:id=\"searchBar\" was not injected: check your FXML file 'NewApp.fxml'.";
-        assert definition != null : "fx:id=\"definition\" was not injected: check your FXML file 'NewApp.fxml'.";
     }
 }
