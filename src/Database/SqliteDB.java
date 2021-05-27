@@ -23,9 +23,9 @@ public class SqliteDB {
     }
 
     /**
-     *
-     * @param word
-     * @return
+     * searches the database for this word (exact match)
+     * @param word - word to search
+     * @return a word object with definition
      */
     public ResultSet getWordAV(String word){
         //searches the database for this word

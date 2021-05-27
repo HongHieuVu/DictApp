@@ -28,7 +28,7 @@ public class AppController {
     private URL location;
 
     @FXML
-    private TableView<Word> table = new TableView<>();
+    private TableView<Word> table;
     private ObservableList<Word> data;
 
     @FXML // fx:id="definition"
@@ -38,8 +38,8 @@ public class AppController {
     private TextField searchBar; // Value injected by FXMLLoader
 
     /**
-     *
-     * @param event
+     * search selected word
+     * @param event mouse over
      */
     @FXML
     void searchInput(KeyEvent event) {
@@ -49,7 +49,9 @@ public class AppController {
             data = FXCollections.observableArrayList(searchResultList);
             table.setItems(data);
             TableColumn<Word, String> resultCol = new TableColumn<>("Kết quả");
-            resultCol.setCellValueFactory(new PropertyValueFactory<>(searchResultList.get(0).wordTargetProperty().getName()));
+            resultCol.setCellValueFactory(
+                    new PropertyValueFactory<>(searchResultList.get(0).wordTargetProperty().getName())
+            );
             table.getColumns().setAll(resultCol);
             definition.setText("ấn vào từ trong danh sách để xem giải nghĩa");
         } catch (IllegalArgumentException | IllegalStateException e){
@@ -58,8 +60,8 @@ public class AppController {
     }
 
     /**
-     *
-     * @param event
+     * show result for selected word
+     * @param event mouse over
      */
     @FXML
     void showWord(MouseEvent event) {
@@ -79,9 +81,8 @@ public class AppController {
 
     @FXML
     void initialize() {
+        table = new TableView<>();
         assert searchBar != null : "fx:id=\"searchBar\" was not injected: check your FXML file 'NewApp.fxml'.";
         assert definition != null : "fx:id=\"definition\" was not injected: check your FXML file 'NewApp.fxml'.";
-        assert table != null : "fx:id=\"table\" was not injected: check your FXML file 'NewApp.fxml'.";
-
     }
 }
