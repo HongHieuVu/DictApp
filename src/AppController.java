@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import Database.DBExceptions.NoResult;
-import Database.SqliteDB;
+import Database.Database;
 import Database.Word;
 
 import javafx.collections.FXCollections;
@@ -22,6 +22,7 @@ import javafx.scene.web.WebView;
 public class AppController {
 
     public javafx.scene.web.WebView WebView = new WebView();
+    WebEngine viewer;
     @FXML
     private ResourceBundle resources;
 
@@ -30,21 +31,21 @@ public class AppController {
 
     @FXML
     private TableView<Word> table = new TableView<>();
-    private ObservableList<Word> data;
 
     @FXML // fx:id="searchBar"
     private TextField searchBar;
 
     /**
      * search selected word
+     *
      * @param event mouse over
      */
     @FXML
     void searchInput(KeyEvent event) {
-        SqliteDB sqldb = new SqliteDB();
+        Database sqldb = new Database();
         try {
             List<Word> searchResultList = sqldb.searchInitialEV(searchBar.getText());
-            data = FXCollections.observableArrayList(searchResultList);
+            ObservableList<Word> data = FXCollections.observableArrayList(searchResultList);
             table.setItems(data);
             TableColumn<Word, String> resultCol = new TableColumn<>("Kết quả");
             resultCol.setCellValueFactory(
@@ -52,34 +53,34 @@ public class AppController {
             );
             table.getColumns().setAll(resultCol);
             viewer.loadContent("ấn vào từng từ để xem giải nghĩa");
-        } catch (IllegalArgumentException | IllegalStateException e){
+        } catch (IllegalArgumentException | IllegalStateException e) {
             System.out.println(e.getMessage());
         }
     }
 
     /**
      * show result for selected word
+     *
      * @param event mouse over
      */
     @FXML
     void showWord(MouseEvent event) {
         String selectedWord = table.getSelectionModel().getSelectedItem().getWord();
-        SqliteDB database = new SqliteDB();
+        Database database = new Database();
 
         List<Word> word;
         try {
             word = database.searchWordEV(selectedWord);
             StringBuilder displayText = new StringBuilder();
-            for (Word result : word){
+            for (Word result : word) {
                 displayText.append(result.getHtml()).append("\n");
             }
             viewer.loadContent(displayText.toString());
-        } catch (NoResult noResult){
+        } catch (NoResult noResult) {
             viewer.loadContent("No result for selected word");
         }
     }
 
-    WebEngine viewer;
     @FXML
     void initialize() {
         viewer = WebView.getEngine();
