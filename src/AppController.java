@@ -23,11 +23,6 @@ public class AppController {
 
     public javafx.scene.web.WebView WebView = new WebView();
     WebEngine viewer;
-    @FXML
-    private ResourceBundle resources;
-
-    @FXML
-    private URL location;
 
     @FXML
     private TableView<Word> table = new TableView<>();
