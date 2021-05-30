@@ -17,14 +17,15 @@ public class Word {
         html = "";
     }
 
-    public Word(String target, String explain, String html) {
-        wordTargetProperty().set(target);
-        wordMeaningProperty().set(explain);
-        this.html = html;
+    public Word(String word, String meaning) {
+        setWord(word);
+        setMeaning(meaning);
     }
 
-    public Word(String target) {
-        wordTargetProperty().set(target);
+    public Word(String target, String explain, String html) {
+        setWord(target);
+        setMeaning(explain);
+        setHtml(html);
     }
 
     public String getWord() {
@@ -50,6 +51,10 @@ public class Word {
 
     public void setMeaning(String explain) {
         wordMeaningProperty().set(explain);
+    }
+
+    public void setHtml(String html) {
+        this.html = html;
     }
 
     public StringProperty wordMeaningProperty() {
