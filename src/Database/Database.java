@@ -1,5 +1,6 @@
 package Database;
 
+import Database.DBExceptions.InvalidQuery;
 import Database.DBExceptions.NoResult;
 
 import java.sql.*;
@@ -66,15 +67,21 @@ public class Database {
 
 
     /**
-     * executes a custom query statement to get a set of unique results
+     * executes a custom query statement to get a set of unique results. To compare results, it is
+     * mandatory to search for the word AND the meaning.
      *
      * @param query      the query to execute, but with word parameter replaced with question mark
      * @param word       word to search for
      * @param searchType specific search type, one of defined at the start of file
      * @return list of unique results
      */
-    private List<Word> queryDatabase(String query, String word, int searchType) {
+    private List<Word> queryDatabase(String query, String word, int searchType){
+        //validate query
+        if (!query.contains(WORD) | !query.contains(MEANING)) return new ArrayList<>();
+
         //handles custom search type
+        if (word.equals(""))
+            return new ArrayList<>(); //to prevent STARTS_WITH search type from getting the entire database
         if (searchType == STARTS_WITH) word += "%";
 
         try {
@@ -85,15 +92,30 @@ public class Database {
             //append result
             List<Word> resultList = new ArrayList<>();
             while (rs.next()) {
-                Word thisWord = new Word(rs.getString(WORD), rs.getString(MEANING), rs.getString(WEB_STYLE));
+                Word thisWord = new Word(rs.getString(WORD), rs.getString(MEANING));
+                if (columnExists(rs, WEB_STYLE)) thisWord.setHtml(rs.getString(WEB_STYLE));
                 if (!thisWord.duplicated(resultList)) resultList.add(thisWord);
             }
 
             return resultList;
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
             return new ArrayList<>();
         }
     }
-}
 
+    /**
+     * checks if a column exists in a query
+     *
+     * @param rs      result set
+     * @param colName name to check against
+     * @return true if column is in query
+     * @throws SQLException when database is corrupt
+     */
+    private boolean columnExists(ResultSet rs, String colName) throws SQLException {
+        ResultSetMetaData rsmd = rs.getMetaData();
+        for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+            if (rsmd.getColumnName(i).equals(colName)) return true;
+        }
+        return false;
+    }
+}
