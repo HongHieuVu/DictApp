@@ -1,5 +1,6 @@
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -23,11 +24,6 @@ public class AppController {
 
     public javafx.scene.web.WebView WebView = new WebView();
     WebEngine viewer;
-    @FXML
-    private ResourceBundle resources;
-
-    @FXML
-    private URL location;
 
     @FXML
     private TableView<Word> table = new TableView<>();

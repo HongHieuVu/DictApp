@@ -10,8 +10,16 @@ public class Database {
     private static final String WORD = "word";
     private static final String MEANING = "description";
     private static final String WEB_STYLE = "html";
+
+    //query customizations (query types)
+    private static final int EXACT_MATCH = 0;
+    private static final int STARTS_WITH = 1;
+
     private static Connection database = null;
 
+    /**
+     * constructor guarantees only one connection is made to database
+     */
     public Database() {
         if (database == null) {
             try {
@@ -27,48 +35,15 @@ public class Database {
     }
 
     /**
-     * searches the database for this word (exact match)
+     * searches the database for words beginning with input string. Method doesn't care if there's
+     * no result.
      *
      * @param word word to search
-     * @return a word object with definition
-     */
-    public ResultSet getWordAV(String word) {
-        String query = " SELECT word, description, pronounce FROM av WHERE word LIKE ?;";
-        try {
-            PreparedStatement preparedStatement = database.prepareStatement(query);
-            preparedStatement.setString(1, word);
-            return preparedStatement.executeQuery();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * searches the database for words beginning with input string
-     *
-     * @param word word to search
-     * @return a list of words beginning with parameter "word"
+     * @return a list of unique words beginning with parameter "word"
      */
     public List<Word> searchInitialEV(String word) {
         String query = " SELECT word, description FROM av WHERE word LIKE ?;";
-        try {
-            //execute query
-            PreparedStatement preparedStatement = database.prepareStatement(query);
-            preparedStatement.setString(1, word + "%");
-            ResultSet rs = preparedStatement.executeQuery();
-
-            //create result list
-            List<Word> resultList = new ArrayList<>();
-            while (rs.next()) {
-                Word wordCreated = new Word(rs.getString(WORD));
-                resultList.add(wordCreated);
-            }
-            return resultList;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
+        return queryDatabase(query, word, STARTS_WITH);
     }
 
     /**
@@ -76,23 +51,40 @@ public class Database {
      *
      * @param word word to be searched
      * @return a list of unique word objects with definitions
+     * @throws NoResult when query list returned empty
      */
     public List<Word> searchWordEV(String word) throws NoResult {
         String query = " SELECT word, description, html, COUNT(*) OVER() AS resNum " +
                 "FROM av WHERE word LIKE ?;";
+        List<Word> resultList = queryDatabase(query, word, EXACT_MATCH);
+
+        //handles if there's no result
+        if (resultList.isEmpty()) throw new NoResult("No definition in database");
+
+        return resultList;
+    }
+
+
+    /**
+     * executes a custom query statement to get a set of unique results
+     *
+     * @param query      the query to execute, but with word parameter replaced with question mark
+     * @param word       word to search for
+     * @param searchType specific search type, one of defined at the start of file
+     * @return list of unique results
+     */
+    private List<Word> queryDatabase(String query, String word, int searchType) {
+        //handles custom search type
+        if (searchType == STARTS_WITH) word += "%";
+
         try {
-            //execute query
             PreparedStatement preparedStatement = database.prepareStatement(query);
             preparedStatement.setString(1, word);
             ResultSet rs = preparedStatement.executeQuery();
 
-            //handle if there's no result
-            int numResult = Integer.parseInt(rs.getString("resNum"));
-            if (numResult == 0) throw new NoResult("No result found for word: " + word);
-
             //append result
             List<Word> resultList = new ArrayList<>();
-            while (rs.next()){
+            while (rs.next()) {
                 Word thisWord = new Word(rs.getString(WORD), rs.getString(MEANING), rs.getString(WEB_STYLE));
                 if (!thisWord.duplicated(resultList)) resultList.add(thisWord);
             }
@@ -100,7 +92,7 @@ public class Database {
             return resultList;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            return null;
+            return new ArrayList<>();
         }
     }
 }
