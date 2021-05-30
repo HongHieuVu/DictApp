@@ -72,11 +72,10 @@ public class Database {
     }
 
     /**
-     * search for definition of input string, should only be used to look up definition
-     * of a key with only 1 matching word (unique word).
+     * search for all definitions of a word.
      *
      * @param word word to be searched
-     * @return a word object with definition of the word entered
+     * @return a list of unique word objects with definitions
      */
     public List<Word> searchWordEV(String word) throws NoResult {
         String query = " SELECT word, description, html, COUNT(*) OVER() AS resNum " +
