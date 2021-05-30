@@ -59,7 +59,8 @@ public class AppController {
     }
 
     /**
-     * show result for selected word
+     * show result for selected word. If there are multiple results then they will be appended
+     * if different from each other
      *
      * @param event mouse over
      */
